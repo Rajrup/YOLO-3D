@@ -7,9 +7,18 @@ import numpy as np
 import torch
 from pathlib import Path
 
-# Set MPS fallback for operations not supported on Apple Silicon
-if hasattr(torch, 'backends') and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-    os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
+
+
+# # Set up display environment for OpenCV GUI
+# os.environ['QT_QPA_PLATFORM'] = 'xcb'  # Use available xcb plugin
+# if 'DISPLAY' not in os.environ:
+#     os.environ['DISPLAY'] = ':1'  # Default display
+
+# # Set OpenCV optimizations (if available)
+# try:
+#     cv2.setUseOptimized(True)
+# except AttributeError:
+#     pass  # Method not available in this OpenCV version
 
 # Import our modules
 from detection_model import ObjectDetector
@@ -23,7 +32,7 @@ def main():
     # ===============================================
     
     # Input/Output
-    source = 0  # Path to input video file or webcam index (0 for default camera)
+    source = "/bigdata/rajrup/Dataset_Repo/panoptic-toolbox/data/160906_band1/kinectRawColorVideos/kinect_50_01.mp4"  # Path to input video file or webcam index (0 for default camera)
     output_path = "output.mp4"  # Path to output video file
     
     # Model settings
@@ -31,7 +40,8 @@ def main():
     depth_model_size = "small"  # Depth Anything v2 model size: "small", "base", "large"
     
     # Device settings
-    device = 'cpu'  # Force CPU for stability
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Force CPU for stability
+    print(f"Using device: {device}")
     
     # Detection settings
     conf_threshold = 0.25  # Confidence threshold for object detection
